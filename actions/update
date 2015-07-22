@@ -1,7 +1,14 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 cd /opt/cloud-benchmarks
+
+PREV_COMMIT=`git rev-parse @`
 git pull
+
 python $CHARM_DIR/hooks/hooks.py
+
+if ! git diff --name-only $PREV_COMMIT...@ | grep -q production.ini; then
+  service cloudbenchmarks restart
+fi
